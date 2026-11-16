@@ -937,6 +937,31 @@ pub(super) fn output(ui: &Ui, p: Paint, layer: &mut Vec<El>, query: &str) -> Vec
             layer,
         ),
     );
+    if cfg!(target_os = "macos") && settings.indicator_position != IndicatorPosition::Hidden {
+        rows.push(
+            tr("HUD offset"),
+            pick_row(
+                ui,
+                p,
+                "indicator-offset",
+                &PANEL,
+                tr("HUD offset"),
+                vec![tr("None"), "1×", "2×", "3×", "4×"],
+                usize::from(
+                    settings
+                        .indicator_offset
+                        .min(crate::app_settings::indicator_offset::MAX),
+                ),
+                |ui, index| {
+                    let offset = index as u8;
+                    if ui.settings.indicator_offset != offset {
+                        ui.update(|settings| settings.indicator_offset = offset);
+                    }
+                },
+                layer,
+            ),
+        );
+    }
     if ui.platform.caps.terminal_paste {
         rows.push_described(
             tr("Terminal paste"),

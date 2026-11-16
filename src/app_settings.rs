@@ -21,6 +21,7 @@ mod capture;
 mod dictation_processing;
 mod extra_shortcuts;
 mod hotkeys;
+pub mod indicator_offset;
 mod labs;
 mod meeting_folder;
 mod meetings;
@@ -82,6 +83,7 @@ static CALENDAR_SETTINGS: OnceLock<RwLock<CalendarSettings>> = OnceLock::new();
 static MICROPHONE_POLICY: AtomicU8 = AtomicU8::new(0);
 static CUSTOM_TRANSFORMATIONS_SELECTED: AtomicBool = AtomicBool::new(false);
 static INDICATOR_POSITION: AtomicU8 = AtomicU8::new(0);
+
 static HOTKEYS: OnceLock<RwLock<AppliedHotkeys>> = OnceLock::new();
 static HOTKEY_CAPTURE_ACTIVE: AtomicBool = AtomicBool::new(false);
 #[cfg(test)]
@@ -358,6 +360,9 @@ pub struct AppSettings {
     /// The interface language code; `None` follows the system language.
     pub ui_language: Option<String>,
     pub indicator_position: IndicatorPosition,
+    /// The dictation HUD's distance from its screen edge in its own heights
+    /// (`indicator_offset`, macOS).
+    pub indicator_offset: u8,
     pub updates: UpdateSettings,
     /// The shared vocabulary (`crate::dictation::vocabulary`). Left out of the file
     /// while empty, so settings without one stay as they were.
@@ -482,6 +487,7 @@ impl Default for AppSettings {
             mouse_shortcut_notice: false,
             ui_language: None,
             indicator_position: IndicatorPosition::default(),
+            indicator_offset: 0,
             updates: UpdateSettings::default(),
             vocabulary: Vec::new(),
             vocabulary_boost: crate::dictation::vocabulary::VocabularyBoost::default(),
@@ -790,6 +796,7 @@ impl AppSettings {
         crate::feedback::set_sound_set(self.sound_theme);
         crate::desktop::i18n::apply(self.ui_language.as_deref());
         INDICATOR_POSITION.store(self.indicator_position as u8, Ordering::Relaxed);
+        indicator_offset::apply(self.indicator_offset);
         #[cfg(not(target_os = "macos"))]
         crate::transcription::local_transcriber::set_device(self.transcription_device);
         RECORDING_DUCK_VOLUME.store(self.recording_duck_volume.to_bits(), Ordering::Relaxed);

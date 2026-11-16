@@ -298,6 +298,21 @@ pub fn notch_placement(
         .flatten()
 }
 
+/// `placed` moved `heights` of the plate (each with the gap under the menu
+/// bar) further from its screen edge: down from the top, up when `bottom`.
+/// A plate over the menu bar or grown from the notch stays where it is.
+pub fn offset(placed: Placed, content: Content, heights: u8, bottom: bool) -> Placed {
+    if placed.over_menu_bar || heights == 0 {
+        return placed;
+    }
+    let step = (content.plate.1 + TOP_OFFSET) * f64::from(heights);
+    let (x, y) = placed.top_left;
+    Placed {
+        top_left: (x, if bottom { y + step } else { y - step }),
+        ..placed
+    }
+}
+
 /// The placed plate's top and bottom edges in screen coordinates (y up),
 /// with an island's room below it.
 pub fn plate_span(placed: &Placed, content: Content) -> (f64, f64) {
@@ -352,6 +367,23 @@ mod tests {
             aux_right: 663.5,
             bar: 24.0,
         }
+    }
+
+    /// The offset setting moves a plate under the menu bar down by whole
+    /// plates and one above the Dock up, and leaves the notch's own alone.
+    #[test]
+    fn an_offset_moves_the_plate_away_from_its_edge() {
+        let step = CONTENT.plate.1 + TOP_OFFSET;
+        let top = place(Placement::Below, &notched(), CONTENT, false);
+        let lowered = offset(top, CONTENT, 1, false);
+        assert_eq!(lowered.top_left, (top.top_left.0, top.top_left.1 - step));
+        assert_eq!(lowered.layout, top.layout);
+        let bottom = place(Placement::Below, &notched(), CONTENT, true);
+        let raised = offset(bottom, CONTENT, 2, true);
+        assert_eq!(raised.top_left.1, bottom.top_left.1 + 2.0 * step);
+        assert_eq!(offset(top, CONTENT, 0, false), top);
+        let island = place(Placement::Notch, &notched(), CONTENT, false);
+        assert_eq!(offset(island, CONTENT, 3, false), island);
     }
 
     /// A 2560 × 1440 flat display left of the main one, its menu bar 24 pt.

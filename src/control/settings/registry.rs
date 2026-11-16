@@ -849,6 +849,12 @@ pub(super) const KEYS: &[Key] = &[
         Kind::Choice(&["top", "bottom", "hidden"]),
         "Where the dictation HUD appears",
     ),
+    key(
+        "indicator_offset",
+        Kind::NumberChoice(&["0", "1", "2", "3", "4"]),
+        "How many of its own heights the dictation HUD sits further from its screen edge: \
+         down from the top, up from the bottom (macOS)",
+    ),
     optional(
         "updates.channel",
         Kind::Choice(&["stable", "dev"]),

@@ -431,6 +431,7 @@ const TRANSLATIONS: &[(&str, &str)] = &[
     ("Auto uses the CPU because {device} stopped responding. Choose GPU to try it again.", "Le mode auto utilise le CPU, car {device} a cessé de répondre. Choisissez GPU pour réessayer."),
     ("Hex uses the CPU because the graphics driver's Vulkan is missing or too old. Update the GPU driver to use the GPU.", "Hex utilise le CPU, car le pilote graphique n'a pas Vulkan ou en a une version trop ancienne. Mettez à jour le pilote GPU pour utiliser le GPU."),
     ("Dictation HUD", "HUD de dictée"),
+    ("HUD offset", "Décalage du HUD"),
     ("Call recording", "Enregistrement des appels"),
     ("Check for updates", "Rechercher des mises à jour"),
     ("Checking for updates…", "Recherche de mises à jour…"),

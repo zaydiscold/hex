@@ -270,7 +270,7 @@ impl Feature {
                 "Up to four more shortcuts that each dictate like the main one, each with its own mode"
             }
             Self::NotchPanel => {
-                "Click the notch for a stopwatch, a countdown timer, and the task you're on. A running clock shows beside the camera."
+                "Click the notch for a stopwatch, a countdown timer, and the task you're on. A running clock shows beside the camera"
             }
             Self::PauseMenu => {
                 "Add Pause Hex to the menu bar. While paused, Hex ignores its shortcuts so other apps get the keys"

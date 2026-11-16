@@ -362,6 +362,12 @@ impl Hud {
                 self.position == IndicatorPosition::Bottom,
             )
         });
+        let placed = hud_placement::offset(
+            placed,
+            content,
+            crate::app_settings::indicator_offset::get(),
+            self.position == IndicatorPosition::Bottom,
+        );
         set_live_text(live_text_beside(&placed, &metrics, content, primary_top));
         if self.placed == Some(placed) {
             return;

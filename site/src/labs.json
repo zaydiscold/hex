@@ -865,6 +865,17 @@
       ],
       "summary": "Keys a second or more into a held modifier-only shortcut no longer end the dictation",
       "title": "Hold through other keys"
+    },
+    {
+      "added": "2026-11-15",
+      "group": "dictation",
+      "groupTitle": "Dictation",
+      "id": "notch-panel",
+      "oses": [
+        "macos"
+      ],
+      "summary": "Click the notch for a stopwatch, a countdown timer, and the task you're on. A running clock shows beside the camera",
+      "title": "Notch panel"
     }
   ]
 }
