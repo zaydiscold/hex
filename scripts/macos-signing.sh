@@ -14,6 +14,15 @@ hex_codesign_identity() {
   fi
   case "$identity" in
     "Developer ID Application:"*"($team_id)") ;;
+    # A local build for its owner's own Mac (HEX_LOCAL_BUILD=1) may be signed
+    # with their Apple Development identity: it keeps permissions across
+    # rebuilds, never updates, and isn't distributed.
+    "Apple Development:"*)
+      if [ "${HEX_LOCAL_BUILD:-}" != 1 ]; then
+        echo "An Apple Development identity signs only a local build (HEX_LOCAL_BUILD=1)." >&2
+        return 1
+      fi
+      ;;
     *)
       echo "Signing identity is not a Developer ID Application identity for team $team_id." >&2
       return 1
