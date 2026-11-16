@@ -42,11 +42,18 @@ executable_name=hex
 bundle="$root/target/app/$bundle_name"
 executable="$bundle/Contents/MacOS/$executable_name"
 
+# A local build needs no trusted timestamp, so it signs without reaching
+# Apple's timestamp server.
+timestamp=--timestamp
+if [ "${HEX_LOCAL_BUILD:-}" = 1 ]; then
+  timestamp=--timestamp=none
+fi
+
 sign() {
   if [ "$identity" = - ]; then
     codesign --force --sign - "$@"
   else
-    codesign --force --timestamp --options runtime --sign "$identity" "$@"
+    codesign --force "$timestamp" --options runtime --sign "$identity" "$@"
   fi
 }
 

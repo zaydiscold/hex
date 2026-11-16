@@ -28,7 +28,12 @@ if [[ -z "$SIGN_ID" && -n "${HEX_TEAM_ID:-}" ]]; then
   SIGN_ID="$(security find-identity -v -p codesigning | awk -F'"' -v team="$HEX_TEAM_ID" '$2 ~ "^Developer ID Application: .*\\(" team "\\)$" { print $2; exit }')"
 fi
 if [[ -n "$SIGN_ID" ]]; then
-  codesign --force --options runtime --timestamp --sign "$SIGN_ID" "$BUNDLE_DIR"
+  # A local build needs no trusted timestamp.
+  TIMESTAMP=--timestamp
+  if [[ "${HEX_LOCAL_BUILD:-}" == 1 ]]; then
+    TIMESTAMP=--timestamp=none
+  fi
+  codesign --force --options runtime "$TIMESTAMP" --sign "$SIGN_ID" "$BUNDLE_DIR"
 else
   codesign --force --sign - "$BUNDLE_DIR"
 fi
