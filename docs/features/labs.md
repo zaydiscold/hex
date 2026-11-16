@@ -2602,7 +2602,8 @@ Esc, a click in another app, or the pointer away 450 ms (not while typing) -> cl
 A clock running, closed  -> ears at the menu bar's height: glyph left (stopwatch, or the
                             countdown's progress ring), time right (m:ss, h:mm:ss)
 Countdown reaches zero   -> stops, rings Glass once, ears turn green with "Done" until opened
-Dictation HUD shows      -> a closed panel tucks its ears in for the HUD's own
+Dictation HUD in the notch -> a closed panel tucks its ears in for the HUD's own;
+                            a HUD at the bottom or under the menu bar leaves them out
 ```
 
 Clocks count wall-clock milliseconds (`notch_panel/clock.rs`) and save to

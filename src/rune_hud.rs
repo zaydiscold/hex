@@ -619,8 +619,13 @@ impl Hud {
         if !self.shown.load(Ordering::Acquire) {
             overlay.show();
             self.shown.store(true, Ordering::Release);
+            // Only a HUD grown out of the notch needs the notch panel's ears
+            // tucked in; one below the menu bar or above the Dock doesn't.
             #[cfg(target_os = "macos")]
-            crate::rune_ui::notch_panel::hud_shown(true);
+            crate::rune_ui::notch_panel::hud_shown(
+                self.placed
+                    .is_some_and(|placed| placed.layout.island.is_some()),
+            );
         }
     }
 

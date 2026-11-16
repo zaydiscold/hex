@@ -407,8 +407,9 @@ pub(crate) fn reconcile(on: bool) {
     }
 }
 
-/// The dictation HUD showed or hid: a closed panel tucks its ears in while
-/// the HUD's are out.
+/// The dictation HUD showed in the notch (`true`), or hid or showed
+/// elsewhere (`false`): a closed panel tucks its ears in while the HUD's
+/// are out.
 pub(crate) fn hud_shown(shown: bool) {
     if let Some(panel) = PANEL.get() {
         panel.update(move |p, tx| {
