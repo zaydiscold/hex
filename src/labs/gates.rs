@@ -335,6 +335,13 @@ pub fn calendar_menu() -> bool {
     CALENDAR_MENU.load(Ordering::Acquire) && Feature::CalendarMenu.on_this_os()
 }
 
+/// Clicking the notch opens a stopwatch, a countdown timer, and a task
+/// (macOS; read when the panel is installed and whenever settings change).
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+pub fn notch_panel() -> bool {
+    on(NOTCH_PANEL) && Feature::NotchPanel.on_this_os()
+}
+
 /// A physical Caps Lock press starts and stops dictation, and its light
 /// follows Hex's recording and processing (macOS; read by the listener on
 /// every pass and by the event tap and HID tracker through their own flag).

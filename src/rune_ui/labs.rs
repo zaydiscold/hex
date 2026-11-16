@@ -610,6 +610,8 @@ fn rows(ui: &Ui) -> Vec<Row> {
             rows.push(row(Feature::QuitClosesWindow, None));
             // macOS's HUD reads the screen's notch from NSScreen.
             rows.push(row(Feature::NotchIndicator, Some(&WAVE)));
+            // An overlay over the notch, above the menu bar.
+            rows.push(row(Feature::NotchPanel, None));
             // Hex's session tap takes the shortcut; ScreenCaptureKit shoots.
             #[cfg(hex_capture)]
             rows.push(row(Feature::Screenshots, Some(&CAMERA)));
@@ -875,6 +877,7 @@ fn row_key(lab: Lab) -> &'static str {
         Feature::GnomeClipboardRestore => "lab-gnome-clipboard-restore",
         Feature::TypedText => "lab-typed-text",
         Feature::NotchIndicator => "lab-notch-indicator",
+        Feature::NotchPanel => "lab-notch-panel",
         Feature::GnomeMeetingCapsules => "lab-gnome-meeting-capsules",
         Feature::GnomeAnnotate => "lab-gnome-annotate",
         Feature::Screenshots => "lab-screenshots",

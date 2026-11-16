@@ -47,26 +47,30 @@ pub(crate) fn pointer_screen(
                 && pointer.y <= frame.origin.y + frame.size.height
         })
         .or_else(|| NSScreen::mainScreen(mtm))?;
+    Some((
+        metrics(&screen),
+        primary.frame().origin.y + primary.frame().size.height,
+        screen.backingScaleFactor(),
+        screen_number(&screen),
+    ))
+}
+
+/// `screen` as `hud_placement` reads it.
+pub(crate) fn metrics(screen: &NSScreen) -> hud_placement::Screen {
     let rect = |r: NSRect| hud_placement::Rect {
         x: r.origin.x,
         y: r.origin.y,
         width: r.size.width,
         height: r.size.height,
     };
-    let metrics = hud_placement::Screen {
+    hud_placement::Screen {
         frame: rect(screen.frame()),
         visible: rect(screen.visibleFrame()),
         safe_top: screen.safeAreaInsets().top,
         aux_left: screen.auxiliaryTopLeftArea().size.width,
         aux_right: screen.auxiliaryTopRightArea().size.width,
         bar: NSStatusBar::systemStatusBar().thickness(),
-    };
-    Some((
-        metrics,
-        primary.frame().origin.y + primary.frame().size.height,
-        screen.backingScaleFactor(),
-        screen_number(&screen),
-    ))
+    }
 }
 
 /// The screen's `NSScreenNumber` (`CGDirectDisplayID`), the id Rune's

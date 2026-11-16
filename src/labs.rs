@@ -192,6 +192,7 @@ impl Feature {
             Self::ShellCompletions => settings.labs.shell_completions,
             Self::YoloMode => settings.labs.yolo_mode,
             Self::CursorContext => settings.labs.cursor_context,
+            Self::NotchPanel => settings.labs.notch_panel,
             Self::MoreDictationShortcuts => settings.labs.more_dictation_shortcuts,
             Self::CopyDictationAudio => settings.labs.copy_dictation_audio,
         }
@@ -277,6 +278,7 @@ impl Feature {
             &mut labs.shell_completions,
             &mut labs.yolo_mode,
             &mut labs.cursor_context,
+            &mut labs.notch_panel,
             &mut labs.more_dictation_shortcuts,
             &mut labs.copy_dictation_audio,
         ]
@@ -368,6 +370,7 @@ impl Feature {
             Self::ShellCompletions => settings.labs.shell_completions = on,
             Self::YoloMode => settings.labs.yolo_mode = on,
             Self::CursorContext => settings.labs.cursor_context = on,
+            Self::NotchPanel => settings.labs.notch_panel = on,
             Self::MoreDictationShortcuts => settings.labs.more_dictation_shortcuts = on,
             Self::CopyDictationAudio => settings.labs.copy_dictation_audio = on,
             // Off, no shortcut keeps a key only the feature allows.
@@ -410,7 +413,7 @@ const SKIP_PAUSES: u64 = 1 << 16;
 const PARAKEET_ULTRA: u64 = 1 << 17;
 const HISTORY_STATS: u64 = 1 << 18;
 const RECENT_DICTATIONS: u64 = 1 << 19;
-// 1 << 20 is free (Stop when the call ends moved to Meetings › Settings).
+// 1 << 20 is the notch panel (below).
 const KEEP_RECORDINGS: u64 = 1 << 21;
 const HIDE_MENU_BAR_ICON: u64 = 1 << 22;
 // 1 << 23 and 1 << 24 are free (Movable meeting capsules and More call apps
@@ -476,6 +479,9 @@ const HISTORY_MULTI_SELECT: u64 = API_TIMESTAMPS << 1;
 /// [`MICROPHONE_LINGER_SECONDS`]. A new lab can take one of the free bits
 /// below the minutes.
 const KEEP_MICROPHONE_OPEN: u64 = HISTORY_MULTI_SELECT << 1;
+/// Clicking the notch opens a stopwatch, a countdown timer, and a task
+/// (macOS). It takes the bit Stop when the call ends left free.
+const NOTCH_PANEL: u64 = 1 << 20;
 
 /// This process's `labs` switches: unknown until settings load or one is
 /// first read.
@@ -807,6 +813,9 @@ pub(crate) fn apply(settings: &LabsSettings) {
     // Labs › Pause from menu bar: turning it off resumes at once, without
     // waiting for the menu to refresh; the menu row hides itself there.
     crate::shortcut_pause::reconcile(pause_menu());
+    // Labs › Notch panel shows or hides the notch's overlay at once.
+    #[cfg(target_os = "macos")]
+    crate::rune_ui::notch_panel::reconcile(notch_panel());
 }
 
 fn encode(settings: &LabsSettings) -> u64 {
@@ -956,6 +965,7 @@ fn encode_where(settings: &LabsSettings, reaches: impl Fn(Feature) -> bool) -> u
         ),
         (Feature::SpeakersOnly, settings.speakers_only, SPEAKERS_ONLY),
         (Feature::PauseMenu, settings.pause_menu, PAUSE_MENU),
+        (Feature::NotchPanel, settings.notch_panel, NOTCH_PANEL),
         (
             Feature::AppModelSwitching,
             settings.app_model_switching,
@@ -1736,6 +1746,22 @@ mod tests {
         assert!(Feature::SpeakersOnly.on_this_os());
         assert_eq!(Feature::SpeakersOnly.added(), 20261109);
         assert_eq!(Feature::SpeakersOnly.audience(), Audience::Everyone);
+    }
+
+    #[test]
+    fn notch_panel_is_its_own_bit_and_macos_only() {
+        assert_eq!(NOTCH_PANEL, 1 << 20);
+        let mut labs = LabsSettings::default();
+        assert_eq!(encode_where(&labs, |_| true) & NOTCH_PANEL, 0);
+        labs.notch_panel = true;
+        let state = encode_where(&labs, |_| true);
+        assert_ne!(state & NOTCH_PANEL, 0);
+        assert_eq!(state & API_TIMESTAMPS, 0);
+        assert_eq!(Feature::NotchPanel.on_this_os(), cfg!(target_os = "macos"));
+        assert_eq!(Feature::NotchPanel.audience(), Audience::Everyone);
+        assert_eq!(Feature::NotchPanel.group(), Group::Dictation);
+        assert_eq!(Feature::NotchPanel.settings_key(), "labs.notch_panel");
+        assert_eq!(Feature::NotchPanel.name(), "notch-panel");
     }
 
     #[test]

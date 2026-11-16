@@ -696,6 +696,12 @@ pub(super) const KEYS: &[Key] = &[
          letters; \"stop dictation\" by default",
     ),
     key(
+        "labs.notch_panel",
+        Kind::Bool,
+        "Labs: clicking the notch opens a stopwatch, a countdown timer, and a task; a running \
+         clock shows beside the camera (macOS)",
+    ),
+    key(
         "meetings.enabled",
         Kind::Bool,
         "Labs: Meetings (beta), call detection, recording, and transcripts",

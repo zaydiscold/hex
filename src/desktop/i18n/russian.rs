@@ -1296,6 +1296,8 @@ const TRANSLATIONS: &[(&str, &str)] = &[
     ("Up to four more shortcuts that each dictate like the main one, each with its own mode", "До четырёх дополнительных сочетаний, каждое диктует как основное, со своим режимом"),
     ("Extra shortcut {}", "Дополнительное сочетание {}"),
     ("Add shortcut", "Добавить сочетание"),
+    ("Notch panel", "Панель в вырезе"),
+    ("Click the notch for a stopwatch, a countdown timer, and the task you're on. A running clock shows beside the camera", "Нажмите на вырез, чтобы открыть секундомер, таймер и текущую задачу. Идущие часы видны рядом с камерой"),
     ("Pause from menu bar", "Пауза из меню-бара"),
     ("Add Pause Hex to the menu bar. While paused, Hex ignores its shortcuts so other apps get the keys", "Добавляет «Приостановить Hex» в меню-бар. Пока Hex на паузе, он игнорирует свои сочетания клавиш, и клавиши получают другие приложения"),
     ("Select multiple dictations", "Выбор нескольких диктовок"),

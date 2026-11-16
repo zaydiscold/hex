@@ -78,6 +78,7 @@ impl Feature {
             | Self::ApiBrowserAccess
             | Self::SpeakersOnly
             | Self::PauseMenu
+            | Self::NotchPanel
             | Self::CalendarMenu
             | Self::PrintStart
             | Self::VoicePrompt
@@ -152,6 +153,7 @@ impl Feature {
             | Self::ApiTimestamps
             | Self::PauseMenu
             | Self::HistoryMultiSelect => 20261110,
+            Self::NotchPanel => 20261115,
             Self::KeepMicrophoneOpen | Self::PrintStart => 20261111,
             Self::ScreenVocabulary
             | Self::VoicePrompt
@@ -269,6 +271,7 @@ impl Feature {
             | Self::CapsLockDictation
             | Self::DoubleTapModifiers
             | Self::PauseMenu
+            | Self::NotchPanel
             | Self::PrintStart
             | Self::ScreenVocabulary
             | Self::CursorContext
@@ -376,6 +379,7 @@ impl Feature {
             Self::GnomeClipboardRestore => "gnome-clipboard-restore",
             Self::TypedText => "typed-text",
             Self::NotchIndicator => "notch-indicator",
+            Self::NotchPanel => "notch-panel",
             Self::GnomeMeetingCapsules => "gnome-meeting-capsules",
             Self::GnomeAnnotate => "gnome-annotate",
             Self::Screenshots => "screenshots",
@@ -459,6 +463,7 @@ impl Feature {
             Self::GnomeClipboardRestore => "labs.gnome_clipboard_restore",
             Self::TypedText => "labs.typed_text",
             Self::NotchIndicator => "labs.notch_indicator",
+            Self::NotchPanel => "labs.notch_panel",
             Self::GnomeMeetingCapsules => "labs.gnome_meeting_capsules",
             Self::GnomeAnnotate => "labs.gnome_annotate",
             Self::Screenshots => "labs.screenshots",

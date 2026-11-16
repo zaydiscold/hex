@@ -1293,6 +1293,8 @@ const TRANSLATIONS: &[(&str, &str)] = &[
     ("Up to four more shortcuts that each dictate like the main one, each with its own mode", "Até quatro atalhos extras que ditam como o principal, cada um com seu próprio modo"),
     ("Extra shortcut {}", "Atalho extra {}"),
     ("Add shortcut", "Adicionar atalho"),
+    ("Notch panel", "Painel do notch"),
+    ("Click the notch for a stopwatch, a countdown timer, and the task you're on. A running clock shows beside the camera", "Clique no notch para ver um cronômetro, um timer e a tarefa atual. Um relógio em andamento aparece ao lado da câmera"),
     ("Pause from menu bar", "Pausar pela barra de menus"),
     ("Add Pause Hex to the menu bar. While paused, Hex ignores its shortcuts so other apps get the keys", "Adiciona Pausar Hex à barra de menus. Enquanto estiver pausado, o Hex ignora os próprios atalhos para que outros apps recebam as teclas"),
     ("Select multiple dictations", "Selecionar vários ditados"),

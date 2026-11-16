@@ -215,6 +215,7 @@ Feature             Pane  Toggle (settings.json, hex settings)   On: what it doe
 │                                        // the_menu_reads_upcoming_then_meetings_then_actions_then_the_app (macos_rune/status_item.rs);
 │                                        // not observed on a real Mac, in a real menu, or opening a real call link
 ├── ⌘Q closes Settings no labs.quit_closes_window      (macOS) the app menu's Quit Hex (⌘Q) closes the Settings window instead of quitting Hex; dictation keeps running, the menu bar icon still quits (#1473)
+├── Notch panel     no    labs.notch_panel             (macOS) clicking the notch grows a black island with a stopwatch, a countdown timer (5m to 1h presets, ±1 min), and the current task; a running clock keeps ears out beside the camera (glyph left, time right), a finished countdown turns them green and rings once; Esc, a click away, or the pointer leaving closes it
 ├── Notch indicator no    labs.notch_indicator         (macOS) on a screen with a notch, the HUD widens the notch sideways in the Dynamic Island's compact style at either visible position: an orange mic and level bars, the macOS spinner, a green checkmark; Hidden still hides it, and flat screens keep the Top/Bottom setting
 ├── Import audio    no    labs.meeting_import           (macOS)   Meetings offers Import audio…: a WAV, M4A, MP3, AIFF, or CAF
 │                                        file is decoded locally, transcribed with the selected model, saved as a normal
@@ -2580,6 +2581,43 @@ with `HEX_HUD_EARS=1` and `rune_hud_frames`. Not yet observed: a real
 dictation through the ears on a Mac with the lab on (`hex dev hud` drives
 them in a debug build), and the failure glyph, which no render covers yet; the
 row renders only in macOS builds, so no golden changes.
+
+Notch panel (`notch-panel`, macOS only, group Dictation): for people who
+want a focus timer in the notch without a second notch app. Its own
+interactive overlay ([rune_ui/notch_panel.rs](../../src/rune_ui/notch_panel.rs))
+sits over the first screen with a hardware notch (else the main screen, with
+a pretend notch the menu bar's height that draws nothing until hovered), at
+window level 26 like the HUD's island, and takes the pointer only on the
+island (`OverlayInput::Regions`), so the menu bar beside it still clicks.
+
+```ts
+Notch, nothing running   -> the notch itself; hovered, it widens 9 pt a side and drops 3 pt
+Click                    -> opens (`geometry::island`, Look::Open): Stopwatch | Timer tabs,
+                            the time at 40 pt, reset, start/pause, the task field and its check
+                            ├── Timer -> presets 5m 15m 25m 45m 1h, then −/+ one minute
+                            ├── Space (task field not focused) -> start or pause
+                            └── Enter in the task field -> saves it and closes
+Esc, a click in another app, or the pointer away 450 ms (not while typing) -> closes,
+                            giving the keyboard back to the app in front
+A clock running, closed  -> ears at the menu bar's height: glyph left (stopwatch, or the
+                            countdown's progress ring), time right (m:ss, h:mm:ss)
+Countdown reaches zero   -> stops, rings Glass once, ears turn green with "Done" until opened
+Dictation HUD shows      -> a closed panel tucks its ears in for the HUD's own
+```
+
+Clocks count wall-clock milliseconds (`notch_panel/clock.rs`) and save to
+`notch-panel.json` in Application Support after every change, so a running
+clock keeps counting through a quit or sleep and a countdown that ended
+meanwhile rings at the next poll. `labs::apply` calls
+`notch_panel::reconcile`, so the toggle shows or hides the overlay at once.
+Checks: the clock rules in `notch_panel/clock.rs`, the shapes in
+`notch_panel/geometry.rs`, and clicks, keys, the pointer leaving and the ring
+driven offscreen in `notch_panel/tests.rs`; `HEX_NOTCH_SNAPS=<folder>` with
+`notch_snapshots` writes each look as a PNG; `notch_panel_is_its_own_bit_and_macos_only`
+in [labs.rs](../../src/labs.rs). Observed on a 14-inch MacBook Pro with the
+lab on: the panel's window sits centred on the notch at level 26 (420 × 240 pt
+from the screen's top). Not yet observed: a click, the keyboard handoff, and a
+ring on real hardware, which the offscreen tests cover but no device run has.
 
 Screenshots (`screenshots`, macOS only, group Annotate): for people who
 miss CleanShot's ⌘⇧4. While on, the shortcut (`screenshots.hotkey`,

@@ -18,7 +18,7 @@ pub(crate) mod hud_placement;
 #[cfg(target_os = "macos")]
 mod macos;
 #[cfg(target_os = "macos")]
-pub(crate) use macos::{activation_policy_changed, pointer_screen};
+pub(crate) use macos::{activation_policy_changed, metrics as screen_metrics, pointer_screen};
 #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub(crate) mod rehome;
 pub(crate) mod spring;
@@ -619,6 +619,8 @@ impl Hud {
         if !self.shown.load(Ordering::Acquire) {
             overlay.show();
             self.shown.store(true, Ordering::Release);
+            #[cfg(target_os = "macos")]
+            crate::rune_ui::notch_panel::hud_shown(true);
         }
     }
 
@@ -637,6 +639,8 @@ impl Hud {
             self.stepped_at = None;
         }
         if self.shown.swap(false, Ordering::AcqRel) {
+            #[cfg(target_os = "macos")]
+            crate::rune_ui::notch_panel::hud_shown(false);
             if let Some(overlay) = &self.this {
                 #[cfg(target_os = "windows")]
                 overlay.fade_out(EXIT_FADE);
@@ -657,6 +661,8 @@ impl Hud {
             self.stepped_at = None;
         }
         if self.shown.swap(false, Ordering::AcqRel) {
+            #[cfg(target_os = "macos")]
+            crate::rune_ui::notch_panel::hud_shown(false);
             if let Some(overlay) = &self.this {
                 overlay.hide();
             }

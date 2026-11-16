@@ -68,6 +68,7 @@ impl Feature {
             | Self::FailureNotices
             | Self::LiveTyping
             | Self::NotchIndicator
+            | Self::NotchPanel
             | Self::VocabularyBiasing
             | Self::ScreenVocabulary
             | Self::PauseBrowser

@@ -38,6 +38,8 @@ mod live_notes;
 pub(crate) mod live_text;
 pub(crate) mod meeting_capsules;
 mod meetings;
+#[cfg(target_os = "macos")]
+pub(crate) mod notch_panel;
 pub(crate) use self::meetings::meeting_import_failed;
 #[cfg(hex_capture)]
 mod captures;

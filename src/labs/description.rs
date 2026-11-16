@@ -212,6 +212,9 @@ impl Feature {
             Self::HoldThroughKeys => {
                 "Keys and clicks a second or more into a held modifier-only shortcut reach the app in front and no longer end the dictation, which the release then finishes as usual. Before that first second a chord still ends it, and a shortcut with a key is unchanged"
             }
+            Self::NotchPanel => {
+                "Click the notch for a stopwatch, a countdown timer, and the task you're on. A running clock shows beside the camera"
+            }
         }
     }
 }

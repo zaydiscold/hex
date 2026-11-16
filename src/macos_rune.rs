@@ -516,6 +516,8 @@ pub fn run(shutdown: &'static AtomicBool, listener: ListenerConfig, hidden: bool
         )
     };
     let hud = crate::rune_hud::install(&mut app);
+    // Labs › Notch panel: shown while the lab is on (`labs::apply`).
+    crate::rune_ui::notch_panel::install(&mut app);
     crate::rune_ui::live_text::install(&mut app, crate::rune_hud::live_text_place);
     // The capture capsule, picker, and ink.
     #[cfg(hex_capture)]
