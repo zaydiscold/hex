@@ -10,6 +10,10 @@ use super::{History, HistoryEntry, HistoryStore};
 
 /// How many applications the summary names.
 pub const TOP_APPS: usize = 5;
+/// How many days the per-day word counts cover, ending today.
+pub const RECENT_DAYS: usize = 14;
+/// The typing speed dictation is measured against, in words per minute.
+pub const TYPING_WPM: u64 = 40;
 
 /// One application and how many retained dictations went to it.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
@@ -39,6 +43,9 @@ pub struct HistoryStats {
     pub active_days: u32,
     /// The most dictated-into applications, most first, then by name.
     pub top_apps: Vec<AppCount>,
+    /// Words inserted on each of the last [`RECENT_DAYS`] local days, oldest
+    /// first and ending today; empty without dictations.
+    pub recent_words: Vec<u64>,
 }
 
 impl HistoryStats {
@@ -48,6 +55,12 @@ impl HistoryStats {
         (self.dictations > 0).then(|| {
             ((self.changed_by_output as f64 * 100.0) / self.dictations as f64).round() as u32
         })
+    }
+
+    /// Whole minutes typing the same words at [`TYPING_WPM`] would have
+    /// taken beyond the time spent speaking them.
+    pub fn minutes_saved(&self) -> u64 {
+        (self.words * 60_000 / TYPING_WPM).saturating_sub(self.audio_ms) / 60_000
     }
 }
 
@@ -63,6 +76,7 @@ pub fn summarize<'a>(
     let mut timed_ms = 0_u64;
     let mut apps: HashMap<&str, u64> = HashMap::new();
     let mut days = std::collections::BTreeSet::new();
+    let mut recent = vec![0_u64; RECENT_DAYS];
     for entry in entries {
         stats.dictations += 1;
         let words = entry.final_text.split_whitespace().count() as u64;
@@ -80,7 +94,16 @@ pub fn summarize<'a>(
         {
             *apps.entry(application).or_default() += 1;
         }
-        days.insert(day_of(entry.timestamp_ms));
+        let day = day_of(entry.timestamp_ms);
+        if let Ok(ago) = usize::try_from(today - day)
+            && ago < RECENT_DAYS
+        {
+            recent[RECENT_DAYS - 1 - ago] += words;
+        }
+        days.insert(day);
+    }
+    if stats.dictations > 0 {
+        stats.recent_words = recent;
     }
     stats.words_per_minute =
         (timed_ms > 0).then(|| ((timed_words as f64 * 60_000.0) / timed_ms as f64).round() as u32);
@@ -200,6 +223,30 @@ mod tests {
         assert_eq!(stats.words_per_minute, Some(50));
         assert_eq!(stats.changed_by_output, 1);
         assert_eq!(stats.changed_percent(), Some(33));
+    }
+
+    #[test]
+    fn recent_days_end_today_and_time_saved_is_against_typing() {
+        let entries = [
+            entry(30, "a b", "a b", None, 0),
+            entry(29, "a", "a", None, 0),
+            // Older than the window, and a day after today: neither shows.
+            entry(30 - RECENT_DAYS as u64, "a", "a", None, 0),
+            entry(31, "a", "a", None, 0),
+        ];
+        let stats = summarize(&entries, 30, utc_day);
+        assert_eq!(stats.recent_words.len(), RECENT_DAYS);
+        assert_eq!(stats.recent_words[RECENT_DAYS - 1], 2);
+        assert_eq!(stats.recent_words[RECENT_DAYS - 2], 1);
+        assert_eq!(stats.recent_words.iter().sum::<u64>(), 3);
+        // 400 words is ten minutes of typing; four were spent speaking.
+        let saved = HistoryStats {
+            words: 400,
+            audio_ms: 240_000,
+            ..HistoryStats::default()
+        };
+        assert_eq!(saved.minutes_saved(), 6);
+        assert_eq!(HistoryStats::default().minutes_saved(), 0);
     }
 
     #[test]
